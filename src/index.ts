@@ -58,6 +58,18 @@ client.on("ready", async () => {
     }
     if (
       message.author.id == client.user?.id &&
+      message.content.includes(AppInfo.prefix + "removeselectchannel ".trim())
+    ) {
+      AppInfo.channel = "";
+      fs.writeFileSync(
+        path.join(userSaveDataPath, "./AppInfo.json"),
+        JSON.stringify(AppInfo, null, 2),
+        "utf8"
+      );
+      message.react("✅");
+    }
+    if (
+      message.author.id == client.user?.id &&
       message.content.includes(`${AppInfo.prefix}selectprefix `)
     ) {
       const args = message.content
@@ -131,20 +143,37 @@ client.on("ready", async () => {
         .replace(`${AppInfo.prefix}mr `, "")
         .split(" ");
       if (args.length < 1) {
-        message.channel.send(`${AppInfo.prefix}mr <số con cần mua>`);
+        message.channel.send(
+          `${AppInfo.prefix}mr <số con cần mua> [poke2 prefix]`
+        );
         return;
       }
       const count = parseInt(args[0]);
-      console.log(count);
-      message.channel.send(`${AppInfo.prefix}m s --n zubat --o price`);
+      let buyArray: string[] = [];
+      await delay(2000);
+      message.channel.send(`${AppInfo.prefix}m s --o price --n zubat `);
       const messages = await message.channel.awaitMessages({
         filter: (m) => m.author.id == "716390085896962058",
         max: 1,
         time: 10000,
       });
-      const data = messages.first()?.embeds[0].description?.split("\n") || [];
+      for (let i = 0; i < count / 20; i++) {
+        if (i != 0) {
+          await delay(1000);
+          messages
+            .first()
+            ?.clickButton(
+              messages.first()?.components[0].components[1].customId || ""
+            );
+        }
+        buyArray = [
+          ...buyArray,
+          ...(messages.first()?.embeds[0].description?.split("\n") || []),
+        ];
+      }
+
       for (let i = 0; i < count; i++) {
-        const pokemonId = data[i].split("　")[0].replace(/\`/g, "");
+        const pokemonId = buyArray[i].split("　")[0].replace(/\`/g, "");
         message.channel.send(`${AppInfo.prefix}m b ${pokemonId}`);
         const messages = await message.channel.awaitMessages({
           filter: (m) => m.author.id == "716390085896962058",
@@ -192,7 +221,12 @@ client.on("ready", async () => {
     }
     if (message.author.id === client.user?.id) return;
     if (!message.guild) return;
-    if (!(message.channel.id == AppInfo.channel)) return;
+    if (
+      !(message.channel.id == AppInfo.channel && AppInfo.channel.length >= 1)
+    ) {
+      console.log("not in channel");
+      return;
+    }
     if (!(message.author.id == "716390085896962058")) return;
     if (message.author.id == "716390085896962058") {
       if (message.embeds[0]) {
@@ -201,8 +235,23 @@ client.on("ready", async () => {
             `${AppInfo.prefix}catch <pokémon>`
           )
         ) {
+          // if server have user  with id is 696161886734909481
+          console.log(message.embeds[0].description);
+          console.log("catch");
           await delay(1000);
           message.channel.send(`${AppInfo.prefix}h`);
+          const humanMessage = await message.channel.awaitMessages({
+            filter: (m) => m.author.id == "716390085896962058",
+            max: 1,
+            time: 10000,
+          });
+          if (
+            humanMessage
+              .first()
+              ?.content.includes("Whoa there. Please tell us you're human!")
+          ) {
+            return;
+          }
           const collector = message.channel.createMessageCollector({
             filter: (m) =>
               m.author.id == "716390085896962058" ||

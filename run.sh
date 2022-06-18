@@ -1,0 +1,1 @@
+npx nodemon ./src/index.ts --config ./nodemon.json
