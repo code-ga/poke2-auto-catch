@@ -35,8 +35,8 @@ client.on("ready", async (client) => {
     if (message.author.id === client.user?.id) return;
     if (!message.guild) return;
     // check in channel
-    if (!(message.author.id == "716390085896962058")) return;
-    const poke2User = client.users.cache.get("716390085896962058") || message.author; // =))
+    if (!(message.author.id == "716390085896962058")) return; // id Poketwo
+    const poke2User = client.users.cache.get("716390085896962058") || message.author; // id Poketwo
     if (message.author.id == poke2User.id) {
       if (message.embeds[0]) {
         if (
@@ -98,7 +98,7 @@ client.on("ready", async (client) => {
                   message.channel.send(`<@${poke2User.id}>catch ` + pokemon);
                   const CaughtMessages = await message.channel.awaitMessages({
                     max: 1,
-                    filter: (m) => m.author.id == "716390085896962058",
+                    filter: (m) => m.author.id == "716390085896962058", // id poketwo
                   });
                   if (
                     CaughtMessages.first()?.content.includes("Congratulations")
