@@ -1,14 +1,18 @@
 import delay from "delay";
 import { Client } from "discord.js-selfbot-v13";
+import fs from "fs"
+import path from "path";
+import { Worker } from 'worker_threads';
+
 const client = new Client(); // All partials are loaded automatically
 
 client.on("ready", async (client) => {
   console.log(`${client.user.username} is ready!`);
-
+  const AppInfo = {
+    prefix: `<@${client.user.id}>`
+  }
+  let spamWorker: Worker;
   client.on("messageCreate", async (message) => {
-    const AppInfo = {
-      prefix: `<@${client.user.id}>`
-    }
     if (
       message.author.id == client.user.id &&
       message.content.includes(`${AppInfo.prefix}repeat `)
@@ -32,6 +36,40 @@ client.on("ready", async (client) => {
       // react tick
       message.react("✅");
     }
+    if (
+      message.author.id == client.user.id &&
+      message.content.includes(`${AppInfo.prefix}spam `)
+    ) {
+      // message.channel.sendTyping();
+      const args = message.content
+        .replace(`${AppInfo.prefix}spam `, "")
+        .split(" ");
+      if (args.length < 1) {
+        message.channel.send(
+          `${AppInfo.prefix}spam <channel>`
+        );
+        return;
+      }
+      const channelId = args[0].replace("<#", "").replace(">", "");
+      const spamChannel = await client.channels.fetch(channelId)
+      if (!spamChannel) {
+        message.channel.send("channel not found")
+        return;
+      }
+      if (!spamChannel.isText()) {
+        message.channel.send("channel not the text channel")
+        return
+      }
+      const savingData = {
+        spamChannel: spamChannel.id
+      }
+      fs.writeFileSync(path.join(__dirname, "data.txt"), JSON.stringify(savingData))
+      if (spamWorker) spamWorker.terminate()
+      spamWorker = new Worker(path.join(__dirname, './spamWorker.ts'));
+
+      // react tick
+      message.react("✅");
+    }
     if (message.author.id === client.user?.id) return;
     if (!message.guild) return;
     // check in channel
@@ -47,7 +85,7 @@ client.on("ready", async (client) => {
           // if server have user  with id is 696161886734909481
           console.log(message.embeds[0].description);
           console.log("catch");
-          await delay(1000);
+          await delay(500);
           message.channel.send(`<@${poke2User.id}>hint`);
           const humanMessage = await message.channel.awaitMessages({
             filter: (m) => m.author.id == poke2User.id,
@@ -93,7 +131,7 @@ client.on("ready", async (client) => {
                     .replace(/\(\)/g, "")
                     .trim()
                     .toLowerCase();
-                  await delay(5000 / content.length);
+                  await delay(500);
                   console.log(`catch pokemon ${pokemon}`);
                   message.channel.send(`<@${poke2User.id}>catch ` + pokemon);
                   const CaughtMessages = await message.channel.awaitMessages({
