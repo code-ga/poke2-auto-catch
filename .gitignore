@@ -6,3 +6,4 @@ accPhu.sh
 package-lock.json
 yarn.lock
 .vscode
+src/cap.ts

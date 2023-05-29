@@ -1,3 +1,0 @@
-{
-  "ignore": ["./data/**/AppInfo.json", "./data/**/pokemonCounts.json"]
-}
