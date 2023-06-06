@@ -128,6 +128,7 @@ client.on("ready", async (client) => {
                 for (let i = 0; i < content.length; i++) {
                   const pokemon = content[i]
                     .replace(/(\d.\s?)/g, "")
+                    .replace(/\./g, "")
                     .replace(/\(\)/g, "")
                     .trim()
                     .toLowerCase();
