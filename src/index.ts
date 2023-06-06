@@ -133,7 +133,7 @@ client.on("ready", async (client) => {
                     .trim()
                     .toLowerCase();
                   await delay(500);
-                  console.log(`catch pokemon ${pokemon}`);
+                  console.log(`catch pokemon ${pokemon} in channel id: ${message.channel.id}`);
                   message.channel.send(`<@${poke2User.id}>catch ` + pokemon);
                   const CaughtMessages = await message.channel.awaitMessages({
                     max: 1,
