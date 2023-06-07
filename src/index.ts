@@ -1,16 +1,16 @@
 import delay from "delay";
 import { Client } from "discord.js-selfbot-v13";
-import fs from "fs"
+import fs from "fs";
 import path from "path";
-import { Worker } from 'worker_threads';
+import { Worker } from "worker_threads";
 
 const client = new Client(); // All partials are loaded automatically
 
 client.on("ready", async (client) => {
   console.log(`${client.user.username} is ready!`);
   const AppInfo = {
-    prefix: `<@${client.user.id}>`
-  }
+    prefix: `<@${client.user.id}>`,
+  };
   let spamWorker: Worker;
   client.on("messageCreate", async (message) => {
     if (
@@ -45,27 +45,28 @@ client.on("ready", async (client) => {
         .replace(`${AppInfo.prefix}spam `, "")
         .split(" ");
       if (args.length < 1) {
-        message.channel.send(
-          `${AppInfo.prefix}spam <channel>`
-        );
+        message.channel.send(`${AppInfo.prefix}spam <channel>`);
         return;
       }
       const channelId = args[0].replace("<#", "").replace(">", "");
-      const spamChannel = await client.channels.fetch(channelId)
+      const spamChannel = await client.channels.fetch(channelId);
       if (!spamChannel) {
-        message.channel.send("channel not found")
+        message.channel.send("channel not found");
         return;
       }
       if (!spamChannel.isText()) {
-        message.channel.send("channel not the text channel")
-        return
+        message.channel.send("channel not the text channel");
+        return;
       }
       const savingData = {
-        spamChannel: spamChannel.id
-      }
-      fs.writeFileSync(path.join(__dirname, "data.txt"), JSON.stringify(savingData))
-      if (spamWorker) spamWorker.terminate()
-      spamWorker = new Worker(path.join(__dirname, './spamWorker.ts'));
+        spamChannel: spamChannel.id,
+      };
+      fs.writeFileSync(
+        path.join(__dirname, "data.txt"),
+        JSON.stringify(savingData)
+      );
+      if (spamWorker) spamWorker.terminate();
+      spamWorker = new Worker(path.join(__dirname, "./spamWorker.ts"));
 
       // react tick
       message.react("✅");
@@ -74,7 +75,8 @@ client.on("ready", async (client) => {
     if (!message.guild) return;
     // check in channel
     if (!(message.author.id == "716390085896962058")) return; // id Poketwo
-    const poke2User = client.users.cache.get("716390085896962058") || message.author; // id Poketwo
+    const poke2User =
+      client.users.cache.get("716390085896962058") || message.author; // id Poketwo
     if (message.author.id == poke2User.id) {
       if (message.embeds[0]) {
         if (
@@ -109,21 +111,23 @@ client.on("ready", async (client) => {
             if (m.embeds[0]) {
               if (m.embeds[0].title?.includes("Name of the Pokemon")) {
                 if (!m.embeds[0].description) {
-                  console.log("don't know that pokemon")
-                  return
+                  console.log("don't know that pokemon");
+                  return;
                 }
                 let content = m.embeds[0].description
                   .replace(/\*/g, "")
                   .split("\n");
-                m.components.forEach(item => {
+                m.components.forEach(async (item) => {
+                  await delay(500);
                   if (item.type == "ACTION_ROW") {
-                    item.components.forEach(item => {
+                    item.components.forEach(async (item) => {
+                      await delay(500);
                       if (item.type == "BUTTON") {
-                        item.click(m)
+                        item.click(m);
                       }
-                    })
+                    });
                   }
-                })
+                });
 
                 for (let i = 0; i < content.length; i++) {
                   const pokemon = content[i]
@@ -133,7 +137,9 @@ client.on("ready", async (client) => {
                     .trim()
                     .toLowerCase();
                   await delay(500);
-                  console.log(`catch pokemon ${pokemon} in channel id: ${message.channel.id}`);
+                  console.log(
+                    `catch pokemon ${pokemon} in channel id: ${message.channel.id}`
+                  );
                   message.channel.send(`<@${poke2User.id}>catch ` + pokemon);
                   const CaughtMessages = await message.channel.awaitMessages({
                     max: 1,
