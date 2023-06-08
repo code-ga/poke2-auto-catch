@@ -66,7 +66,7 @@ client.on("ready", async (client) => {
         JSON.stringify(savingData)
       );
       if (spamWorker) spamWorker.terminate();
-      spamWorker = new Worker(path.join(__dirname, "./spamWorker.js"));
+      spamWorker = new Worker(path.join(__dirname, "./spamWorker.ts"));
 
       // react tick
       message.react("✅");
